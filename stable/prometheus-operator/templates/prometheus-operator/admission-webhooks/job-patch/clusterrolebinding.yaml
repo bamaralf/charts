@@ -16,5 +16,5 @@ roleRef:
 subjects:
   - kind: ServiceAccount
     name: {{ template "prometheus-operator.fullname" . }}-admission
-    namespace: {{ .Release.Namespace }}
+    namespace: {{ template "prometheus-operator.namespace" . }}
 {{- end }}

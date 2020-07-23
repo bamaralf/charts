@@ -8,7 +8,7 @@ This chart bootstraps a single node MySQL deployment on a [Kubernetes](http://ku
 
 ## Prerequisites
 
-- Kubernetes 1.6+ with Beta APIs enabled
+- Kubernetes 1.10+ with Beta APIs enabled
 - PV provisioner support in the underlying infrastructure
 
 ## Installing the Chart
@@ -35,10 +35,10 @@ You can retrieve your root password by running the following command. Make sure 
 To uninstall/delete the `my-release` deployment:
 
 ```bash
-$ helm delete my-release
+$ helm delete --purge my-release
 ```
 
-The command removes all the Kubernetes components associated with the chart and deletes the release.
+The command removes all the Kubernetes components associated with the chart and deletes the release completely.
 
 ## Configuration
 
@@ -49,16 +49,20 @@ The following table lists the configurable parameters of the MySQL chart and the
 | `args`                                       | Additional arguments to pass to the MySQL container.                                         | `[]`                                                 |
 | `initContainer.resources`                    | initContainer resource requests/limits                                                       | Memory: `10Mi`, CPU: `10m`                           |
 | `image`                                      | `mysql` image repository.                                                                    | `mysql`                                              |
-| `imageTag`                                   | `mysql` image tag.                                                                           | `5.7.14`                                             |
+| `imageTag`                                   | `mysql` image tag.                                                                           | `5.7.30`                                             |
 | `busybox.image`                              | `busybox` image repository.                                                                  | `busybox`                                            |
-| `busybox.tag`                                | `busybox` image tag.                                                                         | `1.29.3`                                             |
-| `testFramework.image`                        | `test-framework` image repository.                                                           | `dduportal/bats`                                     |
-| `testFramework.tag`                          | `test-framework` image tag.                                                                  | `0.4.0`                                              |
+| `busybox.tag`                                | `busybox` image tag.                                                                         | `1.32`                                               |
+| `testFramework.enabled`                      | `test-framework` switch.                                                                     | `true`                                               |
+| `testFramework.image`                        | `test-framework` image repository.                                                           | `bats/bats`                                          |
+| `testFramework.tag`                          | `test-framework` image tag.                                                                  | `1.2.1`                                              |
+| `testFramework.imagePullPolicy`              | `test-framework` image pull policy.                                                          | `IfNotPresent`                                       |
+| `testFramework.securityContext`              | `test-framework` securityContext                                                             | `{}`                                                 |
 | `imagePullPolicy`                            | Image pull policy                                                                            | `IfNotPresent`                                       |
 | `existingSecret`                             | Use Existing secret for Password details                                                     | `nil`                                                |
 | `extraVolumes`                               | Additional volumes as a string to be passed to the `tpl` function                            |                                                      |
 | `extraVolumeMounts`                          | Additional volumeMounts as a string to be passed to the `tpl` function                       |                                                      |
 | `extraInitContainers`                        | Additional init containers as a string to be passed to the `tpl` function                    |                                                      |
+| `extraEnvVars`                               | Additional environment variables as a string to be passed to the `tpl` function              |                                                      |
 | `mysqlRootPassword`                          | Password for the `root` user. Ignored if existing secret is provided                         | Random 10 characters                                 |
 | `mysqlUser`                                  | Username of new user to create.                                                              | `nil`                                                |
 | `mysqlPassword`                              | Password for the new user. Ignored if existing secret is provided                            | Random 10 characters                                 |
@@ -82,6 +86,7 @@ The following table lists the configurable parameters of the MySQL chart and the
 | `persistence.subPath`                        | Subdirectory of the volume to mount                                                          | `nil`                                                |
 | `persistence.annotations`                    | Persistent Volume annotations                                                                | {}                                                   |
 | `nodeSelector`                               | Node labels for pod assignment                                                               | {}                                                   |
+| `affinity`                                   | Affinity rules for pod assignment                                                            | {}                                                   |
 | `tolerations`                                | Pod taint tolerations for deployment                                                         | {}                                                   |
 | `metrics.enabled`                            | Start a side-car prometheus exporter                                                         | `false`                                              |
 | `metrics.image`                              | Exporter image                                                                               | `prom/mysqld-exporter`                               |
@@ -104,6 +109,8 @@ The following table lists the configurable parameters of the MySQL chart and the
 | `service.annotations`                        | Kubernetes annotations for mysql                                                             | {}                                                   |
 | `service.type`                               | Kubernetes service type                                                                      | ClusterIP                                            |
 | `service.loadBalancerIP`                     | LoadBalancer service IP                                                                      | `""`                                                 |
+| `serviceAccount.create`                      | Specifies whether a ServiceAccount should be created                                         | `false`                                              |
+| `serviceAccount.name`                        | The name of the ServiceAccount to create                                                     | Generated using the mysql.fullname template          |
 | `ssl.enabled`                                | Setup and use SSL for MySQL connections                                                      | `false`                                              |
 | `ssl.secret`                                 | Name of the secret containing the SSL certificates                                           | mysql-ssl-certs                                      |
 | `ssl.certificates[0].name`                   | Name of the secret containing the SSL certificates                                           | `nil`                                                |
@@ -117,6 +124,7 @@ The following table lists the configurable parameters of the MySQL chart and the
 | `podLabels`                                  | Map of labels to add to the pods                                                             | `{}`                                                 |
 | `priorityClassName`                          | Set pod priorityClassName                                                                    | `{}`                                                 |
 | `deploymentAnnotations`		       | Map of annotations for deployment							      | `{}`						     |
+| `strategy`                                   | Update strategy policy                                                                       | `{type: "Recreate"}`                                 |
 
 Some of the parameters above map to the env variables defined in the [MySQL DockerHub image](https://hub.docker.com/_/mysql/).
 
